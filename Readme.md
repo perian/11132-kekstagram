@@ -1,7 +1,7 @@
 # Личный проект «Кекстаграм» [![Build status][travis-image]][travis-url] [![Dependency status][dependency-image]][dependency-url]
 
 * Студент: [perian Дмитрий](https://up.htmlacademy.ru/javascript/4/user/11132).
-* Наставник: `Неизвестно`.
+* Наставник: [Виталий Зюзин](https://htmlacademy.ru/profile/juwain).
 
 ---
 
