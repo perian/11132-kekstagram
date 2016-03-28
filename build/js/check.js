@@ -1,6 +1,6 @@
 function getMessage(a, b) {
   var boolean = true;  
-  var integer = 1;s
+  var integer = 1;
   var array = [];
   var square = 0;
   var sum = 0;
