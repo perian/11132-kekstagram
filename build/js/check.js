@@ -1,13 +1,13 @@
 function getMessage(a, b) {
   var boolean = true;  
-  var integer = 1;
+  var integer = 1;s
   var array = [];
   var square = 0;
   var sum = 0;
   var i;
   if ((typeof a) === (typeof boolean)) {
     if(a) {
-      return ("Переданное GIF-изображение анимировано и содержит " + a + " кадров");
+      return ("Переданное GIF-изображение анимировано и содержит " + b + " кадров");
     } else {
       return ("Переданное GIF-изображение не анимировано");
     }
