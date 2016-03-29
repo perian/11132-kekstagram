@@ -127,6 +127,53 @@
       // некорректно сработает даже очистка холста или нужно будет использовать
       // сложные рассчеты для координат прямоугольника, который нужно очистить.
       this._ctx.restore();
+
+      // Module2 task1 BEGIN
+      this._ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+      this._ctx.strokeStyle = 'rgba(255, 255, 255, 0)';
+      var pallX = this._container.width;
+      var pallY = this._container.height;
+      var holeS = this._resizeConstraint.side;
+      var lineW = this._ctx.lineWidth;
+      
+      this._ctx.beginPath();
+      this._ctx.moveTo(0, 0);
+
+      // Прямоугольник по контуру исходного изображения
+      this._ctx.lineTo(pallX, 0);
+      this._ctx.lineTo(pallX, pallY);
+      this._ctx.lineTo(0, pallY);
+      this._ctx.lineTo(0, 0);
+
+      // Соединяет прямоугольник и квадрат
+      this._ctx.lineTo(
+        pallX/2 - holeS/2 - lineW,
+        pallY/2 - holeS/2 - lineW);
+
+      // Квадрат по контуру кадрируемого изображения
+      this._ctx.lineTo(
+        pallX/2 + holeS/2 - lineW/2,
+        pallY/2 - holeS/2 - lineW);
+      this._ctx.lineTo(
+        pallX/2 + holeS/2 - lineW/2,
+        pallY/2 + holeS/2 - lineW/2);
+      this._ctx.lineTo(
+        pallX/2 - holeS/2 - lineW,
+        pallY/2 + holeS/2 - lineW/2);
+      this._ctx.lineTo(
+        pallX/2 - holeS/2 - lineW,
+        pallY/2 - holeS/2 - lineW);
+      this._ctx.fill('evenodd');
+
+      // Размеры кадрируемого изображения
+      var imgText = this._ctx.measureText(this._image.naturalWidth + ' x ' + this._image.naturalHeight);
+      this._ctx.font = '12px serif';
+      this._ctx.fillStyle = 'rgba(255, 255, 255, 1)';
+      this._ctx.fillText(
+        this._image.naturalWidth + ' x ' + this._image.naturalHeight,
+        pallX/2 - imgText.width/2,
+        pallY/2 - holeS/2 - lineW * 2);
+      // Module2 task1 END
     },
 
     /**
