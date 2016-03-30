@@ -135,7 +135,6 @@
       var pallY = this._container.height;
       var holeS = this._resizeConstraint.side;
       var lineW = this._ctx.lineWidth;
-      
       this._ctx.beginPath();
       this._ctx.moveTo(0, 0);
 
@@ -147,22 +146,22 @@
 
       // Соединяет прямоугольник и квадрат
       this._ctx.lineTo(
-        pallX/2 - holeS/2 - lineW,
-        pallY/2 - holeS/2 - lineW);
+        pallX / 2 - holeS / 2 - lineW,
+        pallY / 2 - holeS / 2 - lineW);
 
       // Квадрат по контуру кадрируемого изображения
       this._ctx.lineTo(
-        pallX/2 + holeS/2 - lineW/2,
-        pallY/2 - holeS/2 - lineW);
+        pallX / 2 + holeS / 2 - lineW / 2,
+        pallY / 2 - holeS / 2 - lineW);
       this._ctx.lineTo(
-        pallX/2 + holeS/2 - lineW/2,
-        pallY/2 + holeS/2 - lineW/2);
+        pallX / 2 + holeS / 2 - lineW / 2,
+        pallY / 2 + holeS / 2 - lineW / 2);
       this._ctx.lineTo(
-        pallX/2 - holeS/2 - lineW,
-        pallY/2 + holeS/2 - lineW/2);
+        pallX / 2 - holeS / 2 - lineW,
+        pallY / 2 + holeS / 2 - lineW / 2);
       this._ctx.lineTo(
-        pallX/2 - holeS/2 - lineW,
-        pallY/2 - holeS/2 - lineW);
+        pallX / 2 - holeS / 2 - lineW,
+        pallY / 2 - holeS / 2 - lineW);
       this._ctx.fill('evenodd');
 
       // Размеры кадрируемого изображения
@@ -171,8 +170,8 @@
       this._ctx.fillStyle = 'rgba(255, 255, 255, 1)';
       this._ctx.fillText(
         this._image.naturalWidth + ' x ' + this._image.naturalHeight,
-        pallX/2 - imgText.width/2,
-        pallY/2 - holeS/2 - lineW * 2);
+        pallX / 2 - imgText.width / 2,
+        pallY / 2 - holeS / 2 - lineW * 2);
       // Module2 task1 END
     },
 
