@@ -81,7 +81,11 @@
    * @return {boolean}
    */
   function resizeFormIsValid() {
-    var setResizeConstraint = function(resizeXValue, resizeYValue, resizeSizeValue) {
+    var setResizeConstraint = function() {
+      var resizeXValue = +resizeX.value;
+      var resizeYValue = +resizeY.value;
+      var resizeSizeValue = +resizeSize.value;
+
       if (resizeXValue > minValue &&
           resizeYValue > minValue &&
           resizeSizeValue > minValue &&
@@ -96,7 +100,7 @@
       } return false;
     };
 
-    setResizeConstraint(+resizeX.value, +resizeY.value, +resizeSize.value);
+    setResizeConstraint();
     resizeX.oninput = setResizeConstraint;
     resizeY.oninput = setResizeConstraint;
     resizeSize.oninput = setResizeConstraint;
