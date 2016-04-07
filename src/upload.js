@@ -81,33 +81,27 @@
    * @return {boolean}
    */
   function resizeFormIsValid() {
-    var setResizeConstraint = function() {
-      var resizeXValue = +resizeX.value;
-      var resizeYValue = +resizeY.value;
-      var resizeSizeValue = +resizeSize.value;
+    var resizeXValue = +resizeX.value;
+    var resizeYValue = +resizeY.value;
+    var resizeSizeValue = +resizeSize.value;
 
-      if (resizeXValue > minValue &&
-          resizeYValue > minValue &&
-          resizeSizeValue > minValue &&
-          resizeXValue + resizeSizeValue < currentResizer._image.naturalWidth &&
-          resizeYValue + resizeSizeValue < currentResizer._image.naturalHeight) {
-        if (resizeBtn.getAttribute('disabled')) {
-          resizeBtn.removeAttribute('disabled');
-        } return true;
-      }
-      if (!(resizeBtn.getAttribute('disabled'))) {
-        resizeBtn.setAttribute('disabled', true);
-      } return false;
-    };
-
-    setResizeConstraint();
-    resizeX.oninput = setResizeConstraint;
-    resizeY.oninput = setResizeConstraint;
-    resizeSize.oninput = setResizeConstraint;
-    return true;
+    if (resizeXValue > minValue &&
+        resizeYValue > minValue &&
+        resizeSizeValue > minValue &&
+        resizeXValue + resizeSizeValue < currentResizer._image.naturalWidth &&
+        resizeYValue + resizeSizeValue < currentResizer._image.naturalHeight) {
+      if (resizeBtn.getAttribute('disabled')) {
+        resizeBtn.removeAttribute('disabled');
+      } return true;
+    }
+    if (!(resizeBtn.getAttribute('disabled'))) {
+      resizeBtn.setAttribute('disabled', true);
+    } return false;
   }
 
-
+  resizeX.oninput = resizeFormIsValid;
+  resizeY.oninput = resizeFormIsValid;
+  resizeSize.oninput = resizeFormIsValid;
 
   /**
    * Форма загрузки изображения.
