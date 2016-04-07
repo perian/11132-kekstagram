@@ -53,6 +53,15 @@
   }
 
   /**
+   * module3-task2
+   */
+  var resizeX = document.querySelector('#resize-x');
+  var resizeY = document.querySelector('#resize-y');
+  var resizeSize = document.querySelector('#resize-size');
+  var resizeBtn = document.querySelector('#resize-fwd');
+  var minValue = 0;
+
+  /**
    * Ставит одну из трех случайных картинок на фон формы загрузки.
    */
   function updateBackground() {
@@ -72,8 +81,27 @@
    * @return {boolean}
    */
   function resizeFormIsValid() {
-    return true;
+    var resizeXValue = +resizeX.value;
+    var resizeYValue = +resizeY.value;
+    var resizeSizeValue = +resizeSize.value;
+
+    if (resizeXValue > minValue &&
+        resizeYValue > minValue &&
+        resizeSizeValue > minValue &&
+        resizeXValue + resizeSizeValue < currentResizer._image.naturalWidth &&
+        resizeYValue + resizeSizeValue < currentResizer._image.naturalHeight) {
+      if (resizeBtn.getAttribute('disabled')) {
+        resizeBtn.removeAttribute('disabled');
+      } return true;
+    }
+    if (!(resizeBtn.getAttribute('disabled'))) {
+      resizeBtn.setAttribute('disabled', true);
+    } return false;
   }
+
+  resizeX.oninput = resizeFormIsValid;
+  resizeY.oninput = resizeFormIsValid;
+  resizeSize.oninput = resizeFormIsValid;
 
   /**
    * Форма загрузки изображения.
