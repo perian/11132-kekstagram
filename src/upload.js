@@ -53,13 +53,20 @@
   }
 
   /**
-   * module3-task2
+   * Поля ввода значений для кадрирования изображения
+   * слева,
+   * сверху,
+   * сторона.
+   * Кнопка отправки значений.
    */
   var resizeX = document.querySelector('#resize-x');
   var resizeY = document.querySelector('#resize-y');
   var resizeSize = document.querySelector('#resize-size');
   var resizeBtn = document.querySelector('#resize-fwd');
-  var minValue = 0;
+
+  resizeX.value = 0;
+  resizeY.value = 0;
+  resizeSize.value = 0;
 
   /**
    * Ставит одну из трех случайных картинок на фон формы загрузки.
@@ -81,10 +88,16 @@
    * @return {boolean}
    */
   function resizeFormIsValid() {
+    var minValue = 0;
     var resizeXValue = +resizeX.value;
     var resizeYValue = +resizeY.value;
     var resizeSizeValue = +resizeSize.value;
 
+    /**
+     * Проверка, входят ли данные в допустимый диапазон значений.
+     * Если да, включает кнопку отправки значений.
+     * Если нет, выкоючает.
+     */
     if (resizeXValue > minValue &&
         resizeYValue > minValue &&
         resizeSizeValue > minValue &&
@@ -99,9 +112,46 @@
     } return false;
   }
 
+  /**
+   * Проверка валидации при изменении значения в форме кадрирования.
+   */
   resizeX.oninput = resizeFormIsValid;
   resizeY.oninput = resizeFormIsValid;
   resizeSize.oninput = resizeFormIsValid;
+
+  /**
+   * Подключаем библиотеку browser-cookies.
+   * @param {Event} evt
+   */
+  var browserCookies = require('browser-cookies');
+  var uploadFormBtn = document.querySelector('#upload-form-controls-fwd');
+  var checkedFilter = document.getElementsByName('#upload-filter').checked;
+
+  var thisDay = new Date();
+  var thisYear = thisDay.getFullYear();
+  var myBD = new Date(thisYear + '-02-26');
+
+  /**
+   * При загрузке страницы фильтр, записанный в cookies фильтр, выбирается
+   * по умолчанию
+   */
+  checkedFilter = browserCookies.get('checkedFilter') || true;
+
+  uploadFormBtn.onsubmit = function(evt) {
+    evt.preventDefault();
+
+    var daysToExpire = (thisDay - myBD) / 1000 / 24 / 60 / 60;
+
+    /**
+     * Перед отправкой формы сохраняем в cookies последний выбранный фильтр.
+     */
+    browserCookies.set('checkedFilter', checkedFilter.value, {
+      espires: daysToExpire});
+
+    this.submit();
+  };
+
+
 
   /**
    * Форма загрузки изображения.
