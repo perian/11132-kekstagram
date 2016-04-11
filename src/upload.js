@@ -64,10 +64,6 @@
   var resizeSize = document.querySelector('#resize-size');
   var resizeBtn = document.querySelector('#resize-fwd');
 
-  resizeX.value = 0;
-  resizeY.value = 0;
-  resizeSize.value = 0;
-
   /**
    * Ставит одну из трех случайных картинок на фон формы загрузки.
    */
@@ -121,37 +117,23 @@
 
   /**
    * Подключаем библиотеку browser-cookies.
-   * @param {Event} evt
    */
   var browserCookies = require('browser-cookies');
-  var uploadFormBtn = document.querySelector('#upload-form-controls-fwd');
-  var checkedFilter = document.getElementsByName('#upload-filter').checked;
 
+  /**
+   * Выражение рассчитывает количество дней от последней даты дня рождения
+   * до текущего дня.
+   */
   var thisDay = new Date();
   var thisYear = thisDay.getFullYear();
   var myBD = new Date(thisYear + '-02-26');
+  var daysToExpire = (thisDay - myBD) / 1000 / 24 / 60 / 60;
 
   /**
-   * При загрузке страницы фильтр, записанный в cookies фильтр, выбирается
+   * При загрузке страницы, записанный в cookies фильтр, выбирается
    * по умолчанию
    */
-  checkedFilter = browserCookies.get('checkedFilter') || true;
-
-  uploadFormBtn.onsubmit = function(evt) {
-    evt.preventDefault();
-
-    var daysToExpire = (thisDay - myBD) / 1000 / 24 / 60 / 60;
-
-    /**
-     * Перед отправкой формы сохраняем в cookies последний выбранный фильтр.
-     */
-    browserCookies.set('checkedFilter', checkedFilter.value, {
-      espires: daysToExpire});
-
-    this.submit();
-  };
-
-
+  // var selectedFilter = browserCookies.get('selectedFilter') || true;
 
   /**
    * Форма загрузки изображения.
@@ -306,11 +288,14 @@
     uploadForm.classList.remove('invisible');
   };
 
+
   /**
    * Обработчик изменения фильтра. Добавляет класс из filterMap соответствующий
    * выбранному значению в форме.
    */
-  filterForm.onchange = function() {
+  filterForm.onchange = function(evt) {
+    evt.preventDefault();
+
     if (!filterMap) {
       // Ленивая инициализация. Объект не создается до тех пор, пока
       // не понадобится прочитать его в первый раз, а после этого запоминается
@@ -330,6 +315,14 @@
     // убрать предыдущий примененный класс. Для этого нужно или запоминать его
     // состояние или просто перезаписывать.
     filterImage.className = 'filter-image-preview ' + filterMap[selectedFilter];
+
+    /**
+     * Перед отправкой формы сохраняем в cookies последний выбранный фильтр.
+     */
+    browserCookies.set('selectedFilter', selectedFilter, {
+      espires: daysToExpire
+    });
+
   };
 
   cleanupResizer();
