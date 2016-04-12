@@ -130,12 +130,6 @@
   var daysToExpire = (thisDay - myBD) / 1000 / 24 / 60 / 60;
 
   /**
-   * При загрузке страницы, записанный в cookies фильтр, выбирается
-   * по умолчанию
-   */
-  // var selectedFilter = browserCookies.get('selectedFilter') || true;
-
-  /**
    * Форма загрузки изображения.
    * @type {HTMLFormElement}
    */
@@ -157,6 +151,27 @@
    * @type {HTMLImageElement}
    */
   var filterImage = filterForm.querySelector('.filter-image-preview');
+
+  /**
+   * При загрузке страницы, записанный в cookies фильтр, выбирается
+   * по умолчанию
+   */
+  filterImage.className = 'filter-image-preview ' + 'filter-' + browserCookies.get('selectedFilter');
+
+  /**
+   * Отмечает поле согласно записанному в cookie фильтру
+   */
+  var checkedFilter = function() {
+    var checkedAtrbt = document.querySelectorAll('.upload-filter-controls input');
+    for (var i = 0; i < checkedAtrbt.length; i++ ) {
+      checkedAtrbt[i].classList.remove('checked');
+      if (browserCookies.get('selectedFilter') === checkedAtrbt[i].value) {
+        checkedAtrbt[i].classList.add('checked');
+      }
+    }
+  };
+
+  checkedFilter();
 
   /**
    * @type {HTMLElement}
@@ -322,7 +337,6 @@
     browserCookies.set('selectedFilter', selectedFilter, {
       espires: daysToExpire
     });
-
   };
 
   cleanupResizer();
