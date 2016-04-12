@@ -127,7 +127,7 @@
   var thisDay = new Date();
   var thisYear = thisDay.getFullYear();
   var myBirthDay = new Date(thisYear + '-02-26');
-  var daysToExpire = (thisDay - myBirthDay) / 1000 / 24 / 60 / 60;
+  var daysToExpire = Math.round((thisDay - myBirthDay) / 1000 / 24 / 60 / 60);
 
   /**
    * Форма загрузки изображения.
@@ -338,7 +338,7 @@
      * Перед отправкой формы сохраняем в cookies последний выбранный фильтр.
      */
     browserCookies.set('selectedFilter', selectedFilter, {
-      expires: daysToExpire.toFixed()
+      expires: daysToExpire
     });
   };
 
