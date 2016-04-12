@@ -62,7 +62,7 @@
   var resizeX = document.querySelector('#resize-x');
   var resizeY = document.querySelector('#resize-y');
   var resizeSize = document.querySelector('#resize-size');
-  var resizeBtn = document.querySelector('#resize-fwd');
+  var resizeButton = document.querySelector('#resize-fwd');
 
   /**
    * Ставит одну из трех случайных картинок на фон формы загрузки.
@@ -99,12 +99,12 @@
         resizeSizeValue > minValue &&
         resizeXValue + resizeSizeValue < currentResizer._image.naturalWidth &&
         resizeYValue + resizeSizeValue < currentResizer._image.naturalHeight) {
-      if (resizeBtn.getAttribute('disabled')) {
-        resizeBtn.removeAttribute('disabled');
+      if (resizeButton.getAttribute('disabled')) {
+        resizeButton.removeAttribute('disabled');
       } return true;
     }
-    if (!(resizeBtn.getAttribute('disabled'))) {
-      resizeBtn.setAttribute('disabled', true);
+    if (!(resizeButton.getAttribute('disabled'))) {
+      resizeButton.setAttribute('disabled', true);
     } return false;
   }
 
@@ -126,8 +126,8 @@
    */
   var thisDay = new Date();
   var thisYear = thisDay.getFullYear();
-  var myBD = new Date(thisYear + '-02-26');
-  var daysToExpire = (thisDay - myBD) / 1000 / 24 / 60 / 60;
+  var myBirthDay = new Date(thisYear + '-02-26');
+  var daysToExpire = (thisDay - myBirthDay) / 1000 / 24 / 60 / 60;
 
   /**
    * Форма загрузки изображения.
@@ -161,17 +161,20 @@
   /**
    * Отмечает поле согласно записанному в cookie фильтру
    */
-  var checkedFilter = function() {
-    var checkedAtrbt = document.querySelectorAll('.upload-filter-controls input');
-    for (var i = 0; i < checkedAtrbt.length; i++ ) {
-      checkedAtrbt[i].removeAttribute('checked');
-      if (browserCookies.get('selectedFilter') === checkedAtrbt[i].value) {
-        checkedAtrbt[i].setAttribute('checked', true);
+  var elementForCheck = document.querySelectorAll('.upload-filter-controls input');
+
+  var checkedFilter = function(cookie, element) {
+    if (cookie) {
+      for (var i = 0; i < element.length; i++ ) {
+        element[i].removeAttribute('checked');
+        if (cookie === element[i].value) {
+          element[i].setAttribute('checked', true);
+        }
       }
     }
   };
 
-  checkedFilter();
+  checkedFilter(browserCookies.get('selectedFilter'), elementForCheck);
 
   /**
    * @type {HTMLElement}
@@ -335,7 +338,7 @@
      * Перед отправкой формы сохраняем в cookies последний выбранный фильтр.
      */
     browserCookies.set('selectedFilter', selectedFilter, {
-      espires: daysToExpire
+      expires: daysToExpire.toFixed()
     });
   };
 
