@@ -164,9 +164,9 @@
   var checkedFilter = function() {
     var checkedAtrbt = document.querySelectorAll('.upload-filter-controls input');
     for (var i = 0; i < checkedAtrbt.length; i++ ) {
-      checkedAtrbt[i].classList.remove('checked');
+      checkedAtrbt[i].removeAttribute('checked');
       if (browserCookies.get('selectedFilter') === checkedAtrbt[i].value) {
-        checkedAtrbt[i].classList.add('checked');
+        checkedAtrbt[i].setAttribute('checked', true);
       }
     }
   };
