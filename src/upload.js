@@ -53,13 +53,16 @@
   }
 
   /**
-   * module3-task2
+   * Поля ввода значений для кадрирования изображения
+   * слева,
+   * сверху,
+   * сторона.
+   * Кнопка отправки значений.
    */
   var resizeX = document.querySelector('#resize-x');
   var resizeY = document.querySelector('#resize-y');
   var resizeSize = document.querySelector('#resize-size');
-  var resizeBtn = document.querySelector('#resize-fwd');
-  var minValue = 0;
+  var resizeButton = document.querySelector('#resize-fwd');
 
   /**
    * Ставит одну из трех случайных картинок на фон формы загрузки.
@@ -81,27 +84,50 @@
    * @return {boolean}
    */
   function resizeFormIsValid() {
+    var minValue = 0;
     var resizeXValue = +resizeX.value;
     var resizeYValue = +resizeY.value;
     var resizeSizeValue = +resizeSize.value;
 
+    /**
+     * Проверка, входят ли данные в допустимый диапазон значений.
+     * Если да, включает кнопку отправки значений.
+     * Если нет, выкоючает.
+     */
     if (resizeXValue > minValue &&
         resizeYValue > minValue &&
         resizeSizeValue > minValue &&
         resizeXValue + resizeSizeValue < currentResizer._image.naturalWidth &&
         resizeYValue + resizeSizeValue < currentResizer._image.naturalHeight) {
-      if (resizeBtn.getAttribute('disabled')) {
-        resizeBtn.removeAttribute('disabled');
+      if (resizeButton.getAttribute('disabled')) {
+        resizeButton.removeAttribute('disabled');
       } return true;
     }
-    if (!(resizeBtn.getAttribute('disabled'))) {
-      resizeBtn.setAttribute('disabled', true);
+    if (!(resizeButton.getAttribute('disabled'))) {
+      resizeButton.setAttribute('disabled', true);
     } return false;
   }
 
+  /**
+   * Проверка валидации при изменении значения в форме кадрирования.
+   */
   resizeX.oninput = resizeFormIsValid;
   resizeY.oninput = resizeFormIsValid;
   resizeSize.oninput = resizeFormIsValid;
+
+  /**
+   * Подключаем библиотеку browser-cookies.
+   */
+  var browserCookies = require('browser-cookies');
+
+  /**
+   * Выражение рассчитывает количество дней от последней даты дня рождения
+   * до текущего дня.
+   */
+  var thisDay = new Date();
+  var thisYear = thisDay.getFullYear();
+  var myBirthDay = new Date(thisYear + '-02-26');
+  var daysToExpire = Math.round((thisDay - myBirthDay) / 1000 / 24 / 60 / 60);
 
   /**
    * Форма загрузки изображения.
@@ -125,6 +151,30 @@
    * @type {HTMLImageElement}
    */
   var filterImage = filterForm.querySelector('.filter-image-preview');
+
+  /**
+   * При загрузке страницы, записанный в cookies фильтр, выбирается
+   * по умолчанию
+   */
+  filterImage.className = 'filter-image-preview ' + 'filter-' + browserCookies.get('selectedFilter');
+
+  /**
+   * Отмечает поле согласно записанному в cookie фильтру
+   */
+  var elementForCheck = document.querySelectorAll('.upload-filter-controls input');
+
+  var checkedFilter = function(cookie, element) {
+    if (cookie) {
+      for (var i = 0; i < element.length; i++ ) {
+        element[i].removeAttribute('checked');
+        if (cookie === element[i].value) {
+          element[i].setAttribute('checked', true);
+        }
+      }
+    }
+  };
+
+  checkedFilter(browserCookies.get('selectedFilter'), elementForCheck);
 
   /**
    * @type {HTMLElement}
@@ -256,11 +306,14 @@
     uploadForm.classList.remove('invisible');
   };
 
+
   /**
    * Обработчик изменения фильтра. Добавляет класс из filterMap соответствующий
    * выбранному значению в форме.
    */
-  filterForm.onchange = function() {
+  filterForm.onchange = function(evt) {
+    evt.preventDefault();
+
     if (!filterMap) {
       // Ленивая инициализация. Объект не создается до тех пор, пока
       // не понадобится прочитать его в первый раз, а после этого запоминается
@@ -280,6 +333,13 @@
     // убрать предыдущий примененный класс. Для этого нужно или запоминать его
     // состояние или просто перезаписывать.
     filterImage.className = 'filter-image-preview ' + filterMap[selectedFilter];
+
+    /**
+     * Перед отправкой формы сохраняем в cookies последний выбранный фильтр.
+     */
+    browserCookies.set('selectedFilter', selectedFilter, {
+      expires: daysToExpire
+    });
   };
 
   cleanupResizer();
