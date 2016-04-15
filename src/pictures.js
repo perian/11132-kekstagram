@@ -5,7 +5,6 @@ if (!document.querySelector('.filters.hidden')) {
   hiddenBlockOfFilters.classList.add('hidden');
 }
 
-var pictureUploadExpectant;
 var picturesContainer = document.querySelector('.pictures');
 var pictureTemplateElement = document.getElementById('picture-template');
 
@@ -24,6 +23,7 @@ if ('content' in pictureTemplateElement) {
 *
 */
 var getPictureTemplate = function(data) {
+  var pictureUploadExpectant;
   var PICTURE_UPLOAD_TIMEOUT = 10000;
   var picturesContainerElements = elementToClone.cloneNode(true);
   picturesContainerElements.querySelector('.picture-comments').textContent = data.comments;
@@ -33,8 +33,7 @@ var getPictureTemplate = function(data) {
   /*
   *
   */
-  var image = new Image();
-  image = elementToClone.querySelector('img');
+  var image = picturesContainerElements.querySelector('img');
 
   image.onload = function() {
     clearTimeout(pictureUploadExpectant);
@@ -45,17 +44,16 @@ var getPictureTemplate = function(data) {
   image.src = data.url;
 
   image.onerror = function() {
-    elementToClone.classList.add('picture-load-failure');
+    picturesContainerElements.classList.add('picture-load-failure');
   };
 
   /*
-  * Если за 10 секкунд картинка не загрузилась, прерывает загрузку.
+  * Если за 10 секунд картинка не загрузилась, прерывает загрузку.
   */
   pictureUploadExpectant = setTimeout(function() {
     image.src = '';
-    elementToClone.classList.add('picture-load-failure');
+    picturesContainerElements.classList.add('picture-load-failure');
   }, PICTURE_UPLOAD_TIMEOUT);
-
 
   /*
   * Отображает блок с фильтрами. После загрузки содержимого сайта.
