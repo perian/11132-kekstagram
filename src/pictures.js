@@ -126,10 +126,10 @@ var renderPictures = function(pictures) {
 var getFilteredPictures = function(pictures, filter) {
   var picturesToFilter = pictures.slice(0);
   var compareDates = function(a, b) {
-    return Date.parse(a.date) - Date.parse(b.date);
+    return Date.parse(b.date) - Date.parse(a.date);
   };
   var compareComments = function(a, b) {
-    return a.comments - b.comments;
+    return b.comments - a.comments;
   };
 
   switch (filter) {
