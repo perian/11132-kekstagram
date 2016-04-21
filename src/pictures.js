@@ -70,6 +70,9 @@ var getPictureTemplate = function(data) {
 */
 var getPictures = function(callback) {
   var xhr = new XMLHttpRequest();
+  var removePreloader = function() {
+    picturesContainer.classList.remove('pictures-loading');
+  };
 
   xhr.open('GET', '//o0.github.io/assets/json/pictures.json');
 
@@ -83,7 +86,7 @@ var getPictures = function(callback) {
     var loadedData = JSON.parse(evt.target.response);
     callback(loadedData);
     if (xhr.readyState === 4 ) {
-      picturesContainer.classList.remove('pictures-loading');
+      removePreloader();
     }
   };
 
@@ -91,11 +94,13 @@ var getPictures = function(callback) {
     if (xhr.status !== 200 ) {
       picturesContainer.classList.add('pictures-failure');
     }
+    removePreloader();
   };
 
   xhr.timeout = 10000;
   xhr.ontimeout = function() {
     picturesContainer.classList.add('pictures-failure');
+    removePreloader();
   };
 
   xhr.send();
@@ -106,7 +111,7 @@ var getPictures = function(callback) {
 * @param {Array.<Object>} pictures
 */
 var renderPictures = function(pictures) {
-  pictureTemplateElement.innerHTML = '';
+  picturesContainer.innerHTML = '';
 
   pictures.forEach(function(picture) {
     getPictureTemplate(picture, pictureTemplateElement);
@@ -119,19 +124,21 @@ var renderPictures = function(pictures) {
 * @param {Array.<Object>} pictures
 */
 var getFilteredPictures = function(pictures, filter) {
-  debugger;
   var picturesToFilter = pictures.slice(0);
-
+  var compareDates = function(a, b) {
+    return Date.parse(a.date) - Date.parse(b.date);
+  };
+  var compareComments = function(a, b) {
+    return b.comments - a.comments;
+  };
   switch (filter) {
     case FILTER.NEW:
-      picturesToFilter.sort(function(a, b) {
-        if (Date.parse(a.date) > Date.parse(b.date)) {
-          return 1;
-        }
-        if (Date.parse(a.date) < Date.parse(b.date)) {
-          return -1;
-        }
-      });
+      picturesToFilter.sort(compareDates);
+      console.log(picturesToFilter);
+      break;
+    case FILTER.DISCUSSED:
+      picturesToFilter.sort(compareComments);
+      console.log(picturesToFilter);
       break;
   }
 
