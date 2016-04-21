@@ -129,17 +129,15 @@ var getFilteredPictures = function(pictures, filter) {
     return Date.parse(a.date) - Date.parse(b.date);
   };
   var compareComments = function(a, b) {
-    return b.comments - a.comments;
+    return a.comments - b.comments;
   };
+
   switch (filter) {
     case FILTER.NEW:
       picturesToFilter.sort(compareDates);
-      console.log(picturesToFilter);
       break;
     case FILTER.DISCUSSED:
       picturesToFilter.sort(compareComments);
-      console.log(picturesToFilter);
-      break;
   }
 
   return picturesToFilter;
