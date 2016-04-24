@@ -18,7 +18,7 @@ var FILTER = {
 };
 
 /** constant {number} */
-var PAGE_SIZE = 12;
+var PAGE_SIZE = 4;
 
 /** @type {number} */
 var pageNumber = 0;
@@ -165,6 +165,7 @@ var setFilterOnButton = function(pictures, filter) {
   filteredPictures = getFilteredPictures(pictures, filter);
   pageNumber = 0;
   renderPictures(filteredPictures, pageNumber, true);
+  isWindowFullOfPictures();
 };
 
 /**
@@ -205,16 +206,36 @@ var setScrollEnabled = function() {
   }, 100);
 };
 
-/* Если не весь экран заполнен фотографиями,
-*  отрисовывает страницы пока экран не заполнится. */
-var isWindowFullOfPictures = function() {
+// var renderNextPages = function(reset) {
+//   if (reset) {
+//     pageNumber = 0;
+//     hotelsContainer.innerHTML = '';
+//   }
+//
+//   while(isBottomReached() &&
+//         isNextPageAvailable(hotels, pageNumber, PAGE_SIZE)) {
+//     pageNumber++;
+//     renderHotels(hotels, pageNumber);
+//   }
+// };
+
+var bottomIsNotReached = function() {
   var allPictures = picturesContainer.querySelectorAll(['.picture']);
   var lastPicture = allPictures[allPictures.length - 1];
   var lowestPicturesPoisiton = lastPicture.getBoundingClientRect();
+  var GAP = 100;
 
-  if (lowestPicturesPoisiton.bottom > 0) {
-    renderPictures(filteredPictures, pageNumber);
+  console.log(lowestPicturesPoisiton.bottom);
+  return window.innerHeight - lowestPicturesPoisiton.bottom + GAP > 0;
+};
+
+/* Если не весь экран заполнен фотографиями,
+*  отрисовывает страницы пока экран не заполнится. */
+var isWindowFullOfPictures = function() {
+  while (bottomIsNotReached() &&
+    isNextPageAvailable(filteredPictures, pageNumber, PAGE_SIZE)) {
     pageNumber++;
+    renderPictures(filteredPictures, pageNumber);
   }
 };
 
@@ -232,6 +253,6 @@ getPictures(function(loadedData) {
   renderPictures(pictures);
   tunrOnFilterButtons(pictures);
   setFilterOnButton(pictures);
-  setScrollEnabled();
   isWindowFullOfPictures();
+  setScrollEnabled();
 });
