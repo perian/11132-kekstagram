@@ -18,7 +18,7 @@ var FILTER = {
 };
 
 /** constant {number} */
-var PAGE_SIZE = 4;
+var PAGE_SIZE = 12;
 
 /** @type {number} */
 var pageNumber = 0;
@@ -206,33 +206,10 @@ var setScrollEnabled = function() {
   }, 100);
 };
 
-// var renderNextPages = function(reset) {
-//   if (reset) {
-//     pageNumber = 0;
-//     hotelsContainer.innerHTML = '';
-//   }
-//
-//   while(isBottomReached() &&
-//         isNextPageAvailable(hotels, pageNumber, PAGE_SIZE)) {
-//     pageNumber++;
-//     renderHotels(hotels, pageNumber);
-//   }
-// };
-
-var bottomIsNotReached = function() {
-  var allPictures = picturesContainer.querySelectorAll(['.picture']);
-  var lastPicture = allPictures[allPictures.length - 1];
-  var lowestPicturesPoisiton = lastPicture.getBoundingClientRect();
-  var GAP = 100;
-
-  console.log(lowestPicturesPoisiton.bottom);
-  return window.innerHeight - lowestPicturesPoisiton.bottom + GAP > 0;
-};
-
 /* Если не весь экран заполнен фотографиями,
 *  отрисовывает страницы пока экран не заполнится. */
 var isWindowFullOfPictures = function() {
-  while (bottomIsNotReached() &&
+  while (isBottomReached() &&
     isNextPageAvailable(filteredPictures, pageNumber, PAGE_SIZE)) {
     pageNumber++;
     renderPictures(filteredPictures, pageNumber);
