@@ -21,6 +21,9 @@ var FILTER = {
 var PAGE_SIZE = 12;
 
 /** @type {number} */
+var imageHeight = 0;
+
+/** @type {number} */
 var pageNumber = 0;
 /*
 * Задаем ссылку для копирования элементов,
@@ -52,6 +55,8 @@ var getPictureTemplate = function(data) {
   image.width = 182;
   image.height = 182;
   image.src = data.url;
+
+  imageHeight = image.height;
 
   image.onerror = function() {
     picturesContainerElements.classList.add('picture-load-failure');
@@ -119,13 +124,10 @@ var getPictures = function(callback) {
 * @param {Array.<Object>} pictures
 * @param {number} page
 */
-var renderPictures = function(pictures, page, replace) {
-  if (replace) {
-    picturesContainer.innerHTML = '';
-  }
-
+var renderPictures = function(pictures, page) {
   var begin = page * PAGE_SIZE;
   var end = begin + PAGE_SIZE;
+
   pictures.slice(begin, end).forEach(function(picture) {
     getPictureTemplate(picture, pictureTemplateElement);
   });
@@ -163,9 +165,9 @@ var getFilteredPictures = function(pictures, filter) {
 */
 var setFilterOnButton = function(pictures, filter) {
   filteredPictures = getFilteredPictures(pictures, filter);
-  pageNumber = 0;
-  renderPictures(filteredPictures, pageNumber, true);
-  isWindowFullOfPictures();
+
+  pageNumber = -1;
+  drawNextPage(true);
 };
 
 /**
@@ -182,33 +184,31 @@ var isNextPageAvailable = function(pictures, page, pageSize) {
 * @return {boolean}
 */
 var isBottomReached = function() {
-  var allPictures = picturesContainer.querySelectorAll(['.picture']);
-  var lastPicture = allPictures[allPictures.length - 1];
-  var lowestPicturesPoisiton = lastPicture.getBoundingClientRect();
+  var picturesContainerCoordinates = picturesContainer.getBoundingClientRect();
   var GAP = 100;
 
-  return lowestPicturesPoisiton.top - window.innerHeight - GAP <= 0;
+  return picturesContainerCoordinates.bottom - imageHeight - window.innerHeight - GAP <= 0;
 };
 
 /* Если не все страницы с элементами отрисованы
 *  и полоса прокрутки находится у нижней границы экрана,
 *  дорисовывает еще одну страницу. */
 var setScrollEnabled = function() {
-  clearTimeout(setScrollTimeout);
-  var setScrollTimeout = setTimeout(function() {
-    window.addEventListener('scroll', function() {
-      if (isBottomReached() &&
-        isNextPageAvailable(filteredPictures, pageNumber, PAGE_SIZE)) {
-        pageNumber++;
-        renderPictures(filteredPictures, pageNumber);
-      }
+  window.addEventListener('scroll', function() {
+    clearTimeout(setScrollTimeout);
+    var setScrollTimeout = setTimeout(function() {
+      drawNextPage();
     });
   }, 100);
 };
 
 /* Если не весь экран заполнен фотографиями,
 *  отрисовывает страницы пока экран не заполнится. */
-var isWindowFullOfPictures = function() {
+var drawNextPage = function(reset) {
+  if (reset) {
+    picturesContainer.innerHTML = '';
+  }
+
   while (isBottomReached() &&
     isNextPageAvailable(filteredPictures, pageNumber, PAGE_SIZE)) {
     pageNumber++;
@@ -217,7 +217,7 @@ var isWindowFullOfPictures = function() {
 };
 
 /* Включение кнопок cортировки загруженных данных */
-var tunrOnFilterButtons = function(pictures) {
+var turnOnFilterButtons = function(pictures) {
   blockOfFilters.addEventListener('click', function(evt) {
     if (evt.target.classList.contains('filters-radio')) {
       setFilterOnButton(pictures, evt.target.id);
@@ -227,9 +227,8 @@ var tunrOnFilterButtons = function(pictures) {
 
 getPictures(function(loadedData) {
   var pictures = loadedData;
-  renderPictures(pictures);
-  tunrOnFilterButtons(pictures);
+
+  turnOnFilterButtons(pictures);
   setFilterOnButton(pictures);
-  isWindowFullOfPictures();
   setScrollEnabled();
 });
