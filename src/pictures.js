@@ -211,8 +211,8 @@ var drawNextPage = function(reset) {
 
   while (isBottomReached() &&
     isNextPageAvailable(filteredPictures, pageNumber, PAGE_SIZE)) {
-    pageNumber++;
     renderPictures(filteredPictures, pageNumber);
+    pageNumber++;
   }
 };
 
