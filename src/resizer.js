@@ -361,5 +361,5 @@
     this.y = y;
   };
 
-  window.Resizer = Resizer;
+  module.exports = Resizer;
 })();

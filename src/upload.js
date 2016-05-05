@@ -1,4 +1,3 @@
-/* global Resizer: true */
 
 /**
  * @fileoverview
@@ -6,30 +5,40 @@
  */
 
 'use strict';
+/** @enum {string} */
+var FileType = {
+  'GIF': '',
+  'JPEG': '',
+  'PNG': '',
+  'SVG+XML': ''
+};
 
-(function() {
-  /** @enum {string} */
-  var FileType = {
-    'GIF': '',
-    'JPEG': '',
-    'PNG': '',
-    'SVG+XML': ''
-  };
+/** @enum {number} */
+var Action = {
+  ERROR: 0,
+  UPLOADING: 1,
+  CUSTOM: 2
+};
 
-  /** @enum {number} */
-  var Action = {
-    ERROR: 0,
-    UPLOADING: 1,
-    CUSTOM: 2
-  };
+/** constant {number} */
+var RESIZER_FORM_MIN_VALUE = 0;
 
-  /** constant {number} */
-  var RESIZER_FORM_MIN_VALUE = 0;
+/** @enum {number} */
+var resizeXValue = 0;
+var resizeYValue = 0;
+var resizeSizeValue = 0;
 
-  /** @enum {number} */
-  var resizeXValue = 0;
-  var resizeYValue = 0;
-  var resizeSizeValue = 0;
+/**
+ * Поля ввода значений формы кадрирования изображения
+ * @type {string}
+ */
+var resizeX = document.querySelector('#resize-x');
+var resizeY = document.querySelector('#resize-y');
+var resizeSize = document.querySelector('#resize-size');
+var resizeButton = document.querySelector('#resize-fwd');
+
+module.exports = (function() {
+  var Resizer = require('./resizer');
 
   /**
    * Регулярное выражение, проверяющее тип загружаемого файла. Составляется
@@ -59,15 +68,6 @@
       currentResizer = null;
     }
   }
-
-  /**
-   * Поля ввода значений формы кадрирования изображения
-   * @type {string}
-   */
-  var resizeX = document.querySelector('#resize-x');
-  var resizeY = document.querySelector('#resize-y');
-  var resizeSize = document.querySelector('#resize-size');
-  var resizeButton = document.querySelector('#resize-fwd');
 
   /**
    * Ставит одну из трех случайных картинок на фон формы загрузки.
@@ -259,8 +259,6 @@
    * и обновляет фон.
    * @param {Event} evt
    */
-  resizeForm.addEventListener('reset', resetResizeForm);
-
   var resetResizeForm = function(evt) {
     evt.preventDefault();
 
@@ -270,6 +268,8 @@
     resizeForm.classList.add('invisible');
     uploadForm.classList.remove('invisible');
   };
+
+  resizeForm.addEventListener('reset', resetResizeForm);
 
   /**
    * Обработка отправки формы кадрирования. Если форма валидна, экспортирует
@@ -293,7 +293,6 @@
    * Сброс формы фильтра. Показывает форму кадрирования.
    * @param {Event} evt
    */
-  filterForm.addEventListener('reset', resetFilterForm);
 
   var resetFilterForm = function(evt) {
     evt.preventDefault();
@@ -301,6 +300,8 @@
     filterForm.classList.add('invisible');
     resizeForm.classList.remove('invisible');
   };
+
+  filterForm.addEventListener('reset', resetFilterForm);
 
   /**
    * Отправка формы фильтра. Возвращает в начальное состояние, предварительно
@@ -323,11 +324,8 @@
    * Обработчик изменения фильтра. Добавляет класс из filterMap соответствующий
    * выбранному значению в форме.
    */
-  filterForm.addEventListener('change', changeFilterForm);
-
   var changeFilterForm = function(evt) {
     evt.preventDefault();
-
     if (!filterMap) {
       // Ленивая инициализация. Объект не создается до тех пор, пока
       // не понадобится прочитать его в первый раз, а после этого запоминается
@@ -355,6 +353,8 @@
       expires: daysToExpire
     });
   };
+
+  filterForm.addEventListener('change', changeFilterForm);
 
   /**
   * Берет значения смещения и размера кадра из объекта currentResizer
