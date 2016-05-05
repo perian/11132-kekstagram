@@ -1,4 +1,3 @@
-/* global Resizer: true */
 
 /**
  * @fileoverview
@@ -6,22 +5,40 @@
  */
 
 'use strict';
+/** @enum {string} */
+var FileType = {
+  'GIF': '',
+  'JPEG': '',
+  'PNG': '',
+  'SVG+XML': ''
+};
 
-(function() {
-  /** @enum {string} */
-  var FileType = {
-    'GIF': '',
-    'JPEG': '',
-    'PNG': '',
-    'SVG+XML': ''
-  };
+/** @enum {number} */
+var Action = {
+  ERROR: 0,
+  UPLOADING: 1,
+  CUSTOM: 2
+};
 
-  /** @enum {number} */
-  var Action = {
-    ERROR: 0,
-    UPLOADING: 1,
-    CUSTOM: 2
-  };
+/** constant {number} */
+var RESIZER_FORM_MIN_VALUE = 0;
+
+/** @enum {number} */
+var resizeXValue = 0;
+var resizeYValue = 0;
+var resizeSizeValue = 0;
+
+/**
+ * Поля ввода значений формы кадрирования изображения
+ * @type {string}
+ */
+var resizeX = document.querySelector('#resize-x');
+var resizeY = document.querySelector('#resize-y');
+var resizeSize = document.querySelector('#resize-size');
+var resizeButton = document.querySelector('#resize-fwd');
+
+module.exports = (function() {
+  var Resizer = require('./resizer');
 
   /**
    * Регулярное выражение, проверяющее тип загружаемого файла. Составляется
@@ -53,18 +70,6 @@
   }
 
   /**
-   * Поля ввода значений для кадрирования изображения
-   * слева,
-   * сверху,
-   * сторона.
-   * Кнопка отправки значений.
-   */
-  var resizeX = document.querySelector('#resize-x');
-  var resizeY = document.querySelector('#resize-y');
-  var resizeSize = document.querySelector('#resize-size');
-  var resizeButton = document.querySelector('#resize-fwd');
-
-  /**
    * Ставит одну из трех случайных картинок на фон формы загрузки.
    */
   function updateBackground() {
@@ -80,23 +85,21 @@
   }
 
   /**
-   * Проверяет, валидны ли данные, в форме кадрирования.
+   * Проверка, входят ли данные в допустимый диапазон значений.
+   * Если да, включает кнопку отправки значений.
+   * Если нет, выключает.
    * @return {boolean}
    */
-  function resizeFormIsValid() {
-    var minValue = 0;
-    var resizeXValue = +resizeX.value;
-    var resizeYValue = +resizeY.value;
-    var resizeSizeValue = +resizeSize.value;
+  var checkIsResizeFormValid = function() {
+    resizeXValue = +resizeX.value;
+    resizeYValue = +resizeY.value;
+    resizeSizeValue = +resizeSize.value;
 
-    /**
-     * Проверка, входят ли данные в допустимый диапазон значений.
-     * Если да, включает кнопку отправки значений.
-     * Если нет, выкоючает.
-     */
-    if (resizeXValue > minValue &&
-        resizeYValue > minValue &&
-        resizeSizeValue > minValue &&
+    currentResizer.setConstraint(resizeXValue, resizeYValue, resizeSizeValue);
+
+    if (resizeXValue > RESIZER_FORM_MIN_VALUE &&
+        resizeYValue > RESIZER_FORM_MIN_VALUE &&
+        resizeSizeValue > RESIZER_FORM_MIN_VALUE &&
         resizeXValue + resizeSizeValue < currentResizer._image.naturalWidth &&
         resizeYValue + resizeSizeValue < currentResizer._image.naturalHeight) {
       if (resizeButton.getAttribute('disabled')) {
@@ -106,14 +109,14 @@
     if (!(resizeButton.getAttribute('disabled'))) {
       resizeButton.setAttribute('disabled', true);
     } return false;
-  }
+  };
 
   /**
    * Проверка валидации при изменении значения в форме кадрирования.
    */
-  resizeX.oninput = resizeFormIsValid;
-  resizeY.oninput = resizeFormIsValid;
-  resizeSize.oninput = resizeFormIsValid;
+  resizeX.addEventListener('input', checkIsResizeFormValid);
+  resizeY.addEventListener('input', checkIsResizeFormValid);
+  resizeSize.addEventListener('input', checkIsResizeFormValid);
 
   /**
    * Подключаем библиотеку browser-cookies.
@@ -217,7 +220,7 @@
    * и показывается форма кадрирования.
    * @param {Event} evt
    */
-  uploadForm.onchange = function(evt) {
+  var changeUploadForm = function(evt) {
     var element = evt.target;
     if (element.id === 'upload-file') {
       // Проверка типа загружаемого файла, тип должен быть изображением
@@ -249,12 +252,14 @@
     }
   };
 
+  uploadForm.addEventListener('change', changeUploadForm);
+
   /**
    * Обработка сброса формы кадрирования. Возвращает в начальное состояние
    * и обновляет фон.
    * @param {Event} evt
    */
-  resizeForm.onreset = function(evt) {
+  var resetResizeForm = function(evt) {
     evt.preventDefault();
 
     cleanupResizer();
@@ -264,15 +269,17 @@
     uploadForm.classList.remove('invisible');
   };
 
+  resizeForm.addEventListener('reset', resetResizeForm);
+
   /**
    * Обработка отправки формы кадрирования. Если форма валидна, экспортирует
    * кропнутое изображение в форму добавления фильтра и показывает ее.
    * @param {Event} evt
    */
-  resizeForm.onsubmit = function(evt) {
+  var submitResizeForm = function(evt) {
     evt.preventDefault();
 
-    if (resizeFormIsValid()) {
+    if (checkIsResizeFormValid()) {
       filterImage.src = currentResizer.exportImage().src;
 
       resizeForm.classList.add('invisible');
@@ -280,23 +287,28 @@
     }
   };
 
+  resizeForm.addEventListener('submit', submitResizeForm);
+
   /**
    * Сброс формы фильтра. Показывает форму кадрирования.
    * @param {Event} evt
    */
-  filterForm.onreset = function(evt) {
+
+  var resetFilterForm = function(evt) {
     evt.preventDefault();
 
     filterForm.classList.add('invisible');
     resizeForm.classList.remove('invisible');
   };
 
+  filterForm.addEventListener('reset', resetFilterForm);
+
   /**
    * Отправка формы фильтра. Возвращает в начальное состояние, предварительно
    * записав сохраненный фильтр в cookie.
    * @param {Event} evt
    */
-  filterForm.onsubmit = function(evt) {
+  var submitFilterForm = function(evt) {
     evt.preventDefault();
 
     cleanupResizer();
@@ -306,14 +318,14 @@
     uploadForm.classList.remove('invisible');
   };
 
+  filterForm.addEventListener('submit', submitFilterForm);
 
   /**
    * Обработчик изменения фильтра. Добавляет класс из filterMap соответствующий
    * выбранному значению в форме.
    */
-  filterForm.onchange = function(evt) {
+  var changeFilterForm = function(evt) {
     evt.preventDefault();
-
     if (!filterMap) {
       // Ленивая инициализация. Объект не создается до тех пор, пока
       // не понадобится прочитать его в первый раз, а после этого запоминается
@@ -341,6 +353,20 @@
       expires: daysToExpire
     });
   };
+
+  filterForm.addEventListener('change', changeFilterForm);
+
+  /**
+  * Берет значения смещения и размера кадра из объекта currentResizer
+  * и добавляет их в форму.
+  */
+  window.addEventListener('resizerchange', function() {
+    var currentResizerValues = currentResizer.getConstraint();
+
+    resizeX.value = currentResizerValues.x;
+    resizeY.value = currentResizerValues.y;
+    resizeSize.value = currentResizerValues.side;
+  });
 
   cleanupResizer();
   updateBackground();
