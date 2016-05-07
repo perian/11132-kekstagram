@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = (function() {
+(function() {
   var blockOfFilters = document.querySelector('.filters');
   if (!document.querySelector('.filters.hidden')) {
     blockOfFilters.classList.add('hidden');
@@ -77,7 +77,57 @@ module.exports = (function() {
     if (document.querySelector('.filters.hidden')) {
       blockOfFilters.classList.remove('hidden');
     }
+
   };
+
+  var galleryContainer = document.querySelector('.gallery-overlay');
+
+  /** @type {Array.<Object>} pictures */
+  var savePicturesList = function(pictures) {
+    var galleryPicturesList = pictures;
+  };
+
+ /** Отображает галерею */
+  var showGallery = function() {
+    galleryContainer.classList.remove('invisible');
+  };
+
+  /** Скрывает галерею */
+  var hideGallery = function() {
+    galleryContainer.classList.add('invisible');
+  };
+
+  /** Начинает показ галереи с выбранной фотографии*/
+  var showSelectedPicture = function(evt) {
+    var target = evt.target;
+
+    while (target !== picturesContainer) {
+      if (target.parentNode.tagName === 'A') {
+        var selectedPicture = filteredPictures.indexOf(evt.target);
+
+        showGallery(selectedPicture);
+      }
+      return;
+    }
+  };
+
+  picturesContainer.addEventListener('click', showSelectedPicture);
+
+  /** Вызывайте закрытие галереи по клику на черный оверлей вокруг фотографии
+  * или по нажатию на Esc.
+  * Удаляет обработчики событий.
+  */
+  var _onDocumentKeyDown = function(evt) {
+    if (evt.target.classList.contains('gallery-overlay') &&
+       evt.keyCode === 27) {
+      hideGallery();
+
+      picturesContainer.removeEventListener('click', showSelectedPicture);
+      galleryContainer.removeEventListener('keydown', _onDocumentKeyDown);
+    }
+  };
+
+  galleryContainer.addEventListener('keydown', _onDocumentKeyDown);
 
   /*
   * Используем xmlHttpRequest для загрузки массива обьектов с сервера
@@ -98,6 +148,8 @@ module.exports = (function() {
 
     xhr.onload = function(evt) {
       var loadedData = JSON.parse(evt.target.response);
+      module.exports = loadedData;
+
       callback(loadedData);
       if (xhr.readyState === 4 ) {
         removePreloader();
