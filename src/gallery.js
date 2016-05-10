@@ -1,94 +1,111 @@
 'use strict';
 
-// /** Загруженный массив обьектов с сервера.*/
-// /** @type {Array.<Object>} pictures */
-// var pictures = require('./pictures');
-// console.log(pictures.filteredPictures);
-// /** @type {Array.<Object>} */
-// var galleryPicturesList = [];
-//
-// /** @param {Array.<Object>} pictures */
-// var savePicturesList = function(pictures) {
-//   galleryPicturesList = pictures;
-// };
-
-var picturesContainer = document.querySelector('.pictures');
 var galleryContainer = document.querySelector('.gallery-overlay');
 var galleryPicture = galleryContainer.querySelector('img');
+var picturesContainer = document.querySelector('.pictures');
 
-var picturesArray;
-var selectedPicture;
-// var KEYCODE = {
-//   'ESC': 27
-// };
+var galleryPicturesList = [];
+var indexOfPicture;
 
-/** Начинает показ галереи с выбранной фотографии*/
-var selectPicture = function(evt) {
+var KEYCODE = {
+  'ESC': 27
+};
+
+/**
+* @param {Array.<Object>} pictures
+*/
+var setGalleryPictures = function(pictures) {
+  galleryPicturesList = pictures;
+  picturesContainer.addEventListener('click', getIndexOfPicture);
+  galleryContainer.addEventListener('click', _onPhotoClick);
+  galleryContainer.addEventListener('keydown', _onDocumentKeyDown);
+  galleryContainer.addEventListener('click', _onOverlayClick);
+};
+
+/**
+* Отрисовывает фотографию по ее индексу в массиве.
+* @param {number} index
+*/
+var renderGalleryPicture = function(index) {
+  galleryPicture.width = 600;
+  galleryPicture.height = 600;
+  galleryContainer.querySelector('.gallery-overlay-controls-like').textContent = galleryPicturesList[index].likes;
+  galleryContainer.querySelector('.gallery-overlay-controls-comments').textContent = galleryPicturesList[index].comments;
+  galleryPicture.src = galleryPicturesList[index].url;
+};
+
+/**
+* Начинает показ галереи с выбранной фотографии
+* @param {Event} evt
+*/
+var getIndexOfPicture = function(evt) {
   evt.preventDefault();
   var target = evt.target;
-  picturesArray = Array.prototype.slice.call(picturesContainer.children);
-  selectedPicture = picturesArray.indexOf(target.parentNode);
-  galleryPicture.src = target.src;
-  console.log(target.parentNode);
-  console.dir(evt.target);
+  var galleryPicturesArray = Array.prototype.slice.call(picturesContainer.children);
+  indexOfPicture = galleryPicturesArray.indexOf(target.parentNode);
 
   if (evt.target.parentNode.className === 'picture') {
-    showGallery(selectedPicture);
+    showGallery(indexOfPicture);
   }
 };
 
-picturesContainer.addEventListener('click', selectPicture);
-
-/** Показывает следующую фотографию*/
+/**
+* Показывает следующую фотографию в списке
+* @param {Event} evt
+*/
 var _onPhotoClick = function(evt) {
   if (evt.target.classList.contains('gallery-overlay-image')) {
-    ++selectedPicture;
-    galleryPicture.src = picturesArray[selectedPicture].childNodes[1].src;
+    ++indexOfPicture;
+    renderGalleryPicture(indexOfPicture);
   }
 };
 
-galleryContainer.addEventListener('click', _onPhotoClick);
-
-/** Вызывайте закрытие галереи по нажатию на Esc. */
+/**
+* Вызывайте закрытие галереи по нажатию на Esc.
+* @param {Event} evt
+*/
 var _onDocumentKeyDown = function(evt) {
-  if ([27].indexOf(evt.keyCode) > -1) {
-    evt.preventDefault();
+  if (evt.keyCode === KEYCODE.ESC) {
     hideGallery();
   }
 };
 
-galleryContainer.addEventListener('keydown', _onDocumentKeyDown);
-
 /**
 * Вызывайте закрытие галереи по клику на оверлей вокруг фотографии.
 * Удаляет обработчики событий.
+* @param {Event} evt
 */
 var _onOverlayClick = function(evt) {
   if (evt.target.classList.contains('gallery-overlay') ||
       evt.target.classList.contains('gallery-overlay-close')) {
     hideGallery();
+
+    picturesContainer.removeEventListener('click', getIndexOfPicture);
+    galleryContainer.removeEventListener('click', _onPhotoClick);
+    galleryContainer.removeEventListener('keydown', _onDocumentKeyDown);
+    galleryContainer.removeEventListener('click', _onOverlayClick);
   }
 };
 
-galleryContainer.addEventListener('click', _onOverlayClick);
-
 /**
 * Отображает галерею начиная с выбранный картинки
-* @param {number} selectedPicture
+* @param {number} firstpicturetoshow
 */
-var showGallery = function() {
-  galleryContainer.querySelector('.gallery-overlay-controls-like').textContent = selectedPicture.like;
-  galleryContainer.querySelector('.gallery-overlay-controls-comments').textContent = selectedPicture.comments;
-
+var showGallery = function(firstpicturetoshow) {
+  var index = firstpicturetoshow;
+  renderGalleryPicture(index);
   galleryContainer.classList.remove('invisible');
-  console.dir(selectedPicture);
 };
 
-/** Скрывает галерею */
+/**
+* Скрывает галерею
+*/
 var hideGallery = function() {
   galleryContainer.classList.add('invisible');
 };
 
 module.exports = {
-  selectPicture: selectPicture
+  setGalleryPictures: setGalleryPictures,
+  showGallery: showGallery,
+  galleryPicture: galleryPicture
 };

@@ -2,4 +2,3 @@
 require('./upload');
 require('./check');
 require('./pictures');
-require('./gallery');
