@@ -16,10 +16,6 @@ var KEYCODE = {
 */
 var setGalleryPictures = function(pictures) {
   galleryPicturesList = pictures;
-  picturesContainer.addEventListener('click', getIndexOfPicture);
-  galleryContainer.addEventListener('click', _onPhotoClick);
-  galleryContainer.addEventListener('keydown', _onDocumentKeyDown);
-  galleryContainer.addEventListener('click', _onOverlayClick);
 };
 
 /**
@@ -48,6 +44,8 @@ var getIndexOfPicture = function(evt) {
     showGallery(indexOfPicture);
   }
 };
+
+picturesContainer.addEventListener('click', getIndexOfPicture);
 
 /**
 * Показывает следующую фотографию в списке
@@ -80,9 +78,8 @@ var _onOverlayClick = function(evt) {
       evt.target.classList.contains('gallery-overlay-close')) {
     hideGallery();
 
-    picturesContainer.removeEventListener('click', getIndexOfPicture);
     galleryContainer.removeEventListener('click', _onPhotoClick);
-    galleryContainer.removeEventListener('keydown', _onDocumentKeyDown);
+    document.removeEventListener('keydown', _onDocumentKeyDown);
     galleryContainer.removeEventListener('click', _onOverlayClick);
   }
 };
@@ -95,6 +92,10 @@ var showGallery = function(firstpicturetoshow) {
   var index = firstpicturetoshow;
   renderGalleryPicture(index);
   galleryContainer.classList.remove('invisible');
+
+  galleryContainer.addEventListener('click', _onPhotoClick);
+  document.addEventListener('keydown', _onDocumentKeyDown);
+  galleryContainer.addEventListener('click', _onOverlayClick);
 };
 
 /**

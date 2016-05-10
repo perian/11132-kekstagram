@@ -82,7 +82,6 @@
       blockOfFilters.classList.remove('hidden');
     }
     gallery.setGalleryPictures(filteredPictures);
-    gallery.galleryPicture.addEventListener('click', gallery.showGallery);
   };
 
   /**
