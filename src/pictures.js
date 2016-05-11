@@ -3,6 +3,12 @@
 (function() {
   var gallery = require('./gallery');
 
+  /**
+  * Обьект который отрисовывет каждый элемент загруженных данных
+  * @type {Photo}
+  */
+  var Photo = require('./render-picture');
+
   var blockOfFilters = document.querySelector('.filters');
   if (!document.querySelector('.filters.hidden')) {
     blockOfFilters.classList.add('hidden');
@@ -14,6 +20,9 @@
 
   /** @type {Array.<Object>} */
   var filteredPictures = [];
+
+  /** @type {Array.<>} */
+  var renderedPictures = [];
 
   var FILTER = {
     'POPULAR': 'filter-popular',
@@ -29,6 +38,7 @@
 
   /** @type {number} */
   var pageNumber = 0;
+
   /**
   * Задаем ссылку для копирования элементов,
   * в зависимости от того поддерживает ли сайт тэг teamplate.
@@ -82,6 +92,8 @@
       blockOfFilters.classList.remove('hidden');
     }
     gallery.setGalleryPictures(filteredPictures);
+
+    return picturesContainerElements;
   };
 
   /**
@@ -135,7 +147,7 @@
     var end = begin + PAGE_SIZE;
 
     pictures.slice(begin, end).forEach(function(picture) {
-      getPictureTemplate(picture, pictureTemplateElement);
+      renderedPictures.push(new Photo(picture, pictureTemplateElement));
     });
   };
 
@@ -218,7 +230,11 @@
   */
   var drawNextPage = function(reset) {
     if (reset) {
-      picturesContainer.innerHTML = '';
+      renderedPictures.forEach(function(photo) {
+        photo.remove();
+      });
+
+      renderedPictures = [];
     }
 
     while (isBottomReached() &&
@@ -248,4 +264,6 @@
     setFilterOnButton(pictures);
     setScrollEnabled();
   });
+
+  module.exports = getPictureTemplate;
 })();
