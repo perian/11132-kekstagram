@@ -108,5 +108,5 @@ var hideGallery = function() {
 module.exports = {
   setGalleryPictures: setGalleryPictures,
   showGallery: showGallery,
-  galleryPicture: galleryPicture
+  getIndexOfPicture: getIndexOfPicture
 };
