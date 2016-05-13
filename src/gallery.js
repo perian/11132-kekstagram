@@ -99,7 +99,7 @@ var showGallery = function(firstpicturetoshow) {
 };
 
 /**
-* Скрывает галерею
+* Скрывает галерею.
 */
 var hideGallery = function() {
   galleryContainer.classList.add('invisible');
