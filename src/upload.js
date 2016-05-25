@@ -20,9 +20,6 @@ var Action = {
   CUSTOM: 2
 };
 
-/** constant {number} */
-var RESIZER_FORM_MIN_VALUE = 0;
-
 /** @enum {number} */
 var resizeXValue = 0;
 var resizeYValue = 0;
@@ -91,24 +88,26 @@ module.exports = (function() {
    * @return {boolean}
    */
   var checkIsResizeFormValid = function() {
-    resizeXValue = +resizeX.value;
-    resizeYValue = +resizeY.value;
-    resizeSizeValue = +resizeSize.value;
+    resizeXValue = resizeX.valueAsNumber;
+    resizeYValue = resizeY.valueAsNumber;
+    resizeSizeValue = resizeSize.valueAsNumber;
 
     currentResizer.setConstraint(resizeXValue, resizeYValue, resizeSizeValue);
 
-    if (resizeXValue > RESIZER_FORM_MIN_VALUE &&
-        resizeYValue > RESIZER_FORM_MIN_VALUE &&
-        resizeSizeValue > RESIZER_FORM_MIN_VALUE &&
-        resizeXValue + resizeSizeValue < currentResizer._image.naturalWidth &&
-        resizeYValue + resizeSizeValue < currentResizer._image.naturalHeight) {
-      if (resizeButton.getAttribute('disabled')) {
-        resizeButton.removeAttribute('disabled');
-      } return true;
+    if (resizeXValue >= 0
+     && resizeYValue >= 0
+     && resizeSizeValue >= 0
+     && resizeX.validity.valid
+     && resizeY.validity.valid
+     && resizeSize.validity.valid
+     && resizeXValue + resizeSizeValue <= currentResizer._image.naturalWidth
+     && resizeYValue + resizeSizeValue <= currentResizer._image.naturalHeight) {
+      resizeButton.removeAttribute('disabled');
+      return;
     }
     if (!(resizeButton.getAttribute('disabled'))) {
       resizeButton.setAttribute('disabled', true);
-    } return false;
+    }
   };
 
   /**
@@ -117,7 +116,6 @@ module.exports = (function() {
   resizeX.addEventListener('input', checkIsResizeFormValid);
   resizeY.addEventListener('input', checkIsResizeFormValid);
   resizeSize.addEventListener('input', checkIsResizeFormValid);
-
   /**
    * Подключаем библиотеку browser-cookies.
    */
@@ -366,6 +364,8 @@ module.exports = (function() {
     resizeX.value = currentResizerValues.x;
     resizeY.value = currentResizerValues.y;
     resizeSize.value = currentResizerValues.side;
+
+    checkIsResizeFormValid();
   });
 
   cleanupResizer();
