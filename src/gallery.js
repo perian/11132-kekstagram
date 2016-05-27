@@ -99,7 +99,7 @@ var showGallery = function(firstpicturetoshow) {
 };
 
 /**
-* Скрывает галерею
+* Скрывает галерею.
 */
 var hideGallery = function() {
   galleryContainer.classList.add('invisible');
@@ -108,5 +108,5 @@ var hideGallery = function() {
 module.exports = {
   setGalleryPictures: setGalleryPictures,
   showGallery: showGallery,
-  galleryPicture: galleryPicture
+  getIndexOfPicture: getIndexOfPicture
 };
