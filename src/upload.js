@@ -111,7 +111,7 @@ module.exports = (function() {
   };
 
   /**
-   * Проверка валидации при изменении значения в форме кадрирования.
+   * Проверка валидации при изменении значения в форме кадрирования..
    */
   resizeX.addEventListener('input', checkIsResizeFormValid);
   resizeY.addEventListener('input', checkIsResizeFormValid);
