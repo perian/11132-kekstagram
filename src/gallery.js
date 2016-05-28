@@ -106,7 +106,5 @@ var hideGallery = function() {
 };
 
 module.exports = {
-  setGalleryPictures: setGalleryPictures,
-  showGallery: showGallery,
-  galleryPicture: galleryPicture
+  setGalleryPictures: setGalleryPictures
 };
