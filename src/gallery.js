@@ -16,6 +16,7 @@ var KEYCODE = {
 */
 var setGalleryPictures = function(pictures) {
   galleryPicturesList = pictures;
+  return galleryPicturesList;
 };
 
 /**
@@ -25,16 +26,16 @@ var setGalleryPictures = function(pictures) {
 var renderGalleryPicture = function(index) {
   galleryPicture.width = 600;
   galleryPicture.height = 600;
-  galleryContainer.querySelector('.gallery-overlay-controls-like').textContent = galleryPicturesList[index].likes;
-  galleryContainer.querySelector('.gallery-overlay-controls-comments').textContent = galleryPicturesList[index].comments;
+  galleryContainer.querySelector('.likes-count').textContent = galleryPicturesList[index].likes;
+  galleryContainer.querySelector('.comments-count').textContent = galleryPicturesList[index].comments;
   galleryPicture.src = galleryPicturesList[index].url;
 };
 
 /**
-* Начинает показ галереи с выбранной фотографии
+* Начинает показ галереи с выбранной dфотографии
 * @param {Event} evt
 */
-var getIndexOfPicture = function(evt) {
+var openGallery = function(evt) {
   evt.preventDefault();
   var target = evt.target;
   var galleryPicturesArray = Array.prototype.slice.call(picturesContainer.children);
@@ -44,8 +45,6 @@ var getIndexOfPicture = function(evt) {
     showGallery(indexOfPicture);
   }
 };
-
-picturesContainer.addEventListener('click', getIndexOfPicture);
 
 /**
 * Показывает следующую фотографию в списке
@@ -89,8 +88,7 @@ var _onOverlayClick = function(evt) {
 * @param {number} firstpicturetoshow
 */
 var showGallery = function(firstpicturetoshow) {
-  var index = firstpicturetoshow;
-  renderGalleryPicture(index);
+  renderGalleryPicture(firstpicturetoshow);
   galleryContainer.classList.remove('invisible');
 
   galleryContainer.addEventListener('click', _onPhotoClick);
@@ -106,5 +104,6 @@ var hideGallery = function() {
 };
 
 module.exports = {
-  setGalleryPictures: setGalleryPictures
+  setGalleryPictures: setGalleryPictures,
+  openGallery: openGallery
 };

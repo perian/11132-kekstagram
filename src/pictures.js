@@ -9,10 +9,13 @@ if (!document.querySelector('.filters.hidden')) {
 
 var picturesContainer = document.querySelector('.pictures');
 var pictureTemplateElement = document.getElementById('picture-template');
-var image;
+var IMAGE = 182;
 
 /** @type {Array.<Object>} */
 var filteredPictures = [];
+
+/** @type {Array} Photo */
+var renderedPictures = [];
 
 var FILTER = {
   'POPULAR': 'filter-popular',
@@ -22,9 +25,6 @@ var FILTER = {
 
 /** constant {number} */
 var PAGE_SIZE = 12;
-
-/** @type {number} */
-var imageHeight = 0;
 
 /** @type {number} */
 var pageNumber = 0;
@@ -47,11 +47,10 @@ if ('content' in pictureTemplateElement) {
 var getPictureTemplate = function(data) {
   var pictureUploadExpectant;
   var PICTURE_UPLOAD_TIMEOUT = 10000;
-  var picturesContainerElements = elementToClone.cloneNode(true);
-  image = picturesContainerElements.querySelector('img');
-  picturesContainerElements.querySelector('.picture-comments').textContent = data.comments;
-  picturesContainerElements.querySelector('.picture-likes').textContent = data.likes;
-  picturesContainer.appendChild(picturesContainerElements);
+  var pictureElements = elementToClone.cloneNode(true);
+  var image = pictureElements.querySelector('img');
+  pictureElements.querySelector('.picture-comments').textContent = data.comments;
+  pictureElements.querySelector('.picture-likes').textContent = data.likes;
 
   image.onload = function() {
     clearTimeout(pictureUploadExpectant);
@@ -61,10 +60,8 @@ var getPictureTemplate = function(data) {
   image.height = 182;
   image.src = data.url;
 
-  imageHeight = image.height;
-
   image.onerror = function() {
-    picturesContainerElements.classList.add('picture-load-failure');
+    pictureElements.classList.add('picture-load-failure');
   };
 
   /**
@@ -72,7 +69,7 @@ var getPictureTemplate = function(data) {
   */
   pictureUploadExpectant = setTimeout(function() {
     image.src = '';
-    picturesContainerElements.classList.add('picture-load-failure');
+    pictureElements.classList.add('picture-load-failure');
   }, PICTURE_UPLOAD_TIMEOUT);
 
   /**
@@ -83,6 +80,28 @@ var getPictureTemplate = function(data) {
   }
 
   gallery.setGalleryPictures(filteredPictures);
+
+  return pictureElements;
+};
+
+/**
+* Конструктор для отрисовки картинок по шаблону
+* @param {Object} data
+* @constructor
+*/
+var Photo = function(data) {
+  this.data = data;
+  this.element = getPictureTemplate(this.data);
+  this.onPictureClick = function(evt) {
+    gallery.openGallery(evt);
+  };
+  this.remove = function() {
+    this.element.removeEventListener('click', this.onPictureClick);
+    this.element.parentNode.removeChild(this.element);
+  };
+  this.element.addEventListener('click', this.onPictureClick);
+
+  picturesContainer.appendChild(this.element);
 };
 
 /**
@@ -136,7 +155,7 @@ var renderPictures = function(pictures, page) {
   var end = begin + PAGE_SIZE;
 
   pictures.slice(begin, end).forEach(function(picture) {
-    getPictureTemplate(picture, pictureTemplateElement);
+    renderedPictures.push(new Photo(picture));
   });
 };
 
@@ -196,7 +215,7 @@ var isBottomReached = function() {
   var picturesContainerCoordinates = picturesContainer.getBoundingClientRect();
   var GAP = 100;
 
-  return picturesContainerCoordinates.bottom - imageHeight - window.innerHeight - GAP <= 0;
+  return picturesContainerCoordinates.bottom - IMAGE - window.innerHeight - GAP <= 0;
 };
 
 /**
@@ -219,7 +238,10 @@ var setScrollEnabled = function() {
 */
 var drawNextPage = function(reset) {
   if (reset) {
-    picturesContainer.innerHTML = '';
+    renderedPictures.forEach(function(picture) {
+      picture.remove();
+    });
+    renderedPictures = [];
   }
 
   while (isBottomReached() &&
