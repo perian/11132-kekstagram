@@ -79,7 +79,7 @@ var getPictureTemplate = function(data) {
     blockOfFilters.classList.remove('hidden');
   }
 
-  gallery.setGalleryPictures(filteredPictures);
+  gallery.galleryPicture.setGalleryPictures(filteredPictures);
 
   return pictureElements;
 };
@@ -93,7 +93,7 @@ var Photo = function(data) {
   this.data = data;
   this.element = getPictureTemplate(this.data);
   this.onPictureClick = function(evt) {
-    gallery.openGallery(evt);
+    gallery.galleryPicture.openGallery(evt);
   };
   this.remove = function() {
     this.element.removeEventListener('click', this.onPictureClick);
@@ -259,7 +259,7 @@ var turnOnFilterButtons = function(pictures) {
   blockOfFilters.addEventListener('click', function(evt) {
     if (evt.target.classList.contains('filters-radio')) {
       setFilterOnButton(pictures, evt.target.id);
-      gallery.setGalleryPictures(filteredPictures);
+      gallery.galleryPicture.setGalleryPictures(filteredPictures);
     }
   });
 };
